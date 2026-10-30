@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>유튜버 비교 분석</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#fff; --surface-2:#f0f2f5; --text:#14161a; --muted:#646b76;
+  --line:#e3e6eb; --accent:#e5332a; --accent-ink:#fff; --accent-soft:#fdecea;
+  --good:#0f8a5f; --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1114; --surface:#181b20; --surface-2:#21252c; --text:#eef0f3; --muted:#9aa1ad;
+    --line:#2b3038; --accent:#ff4d42; --accent-ink:#fff; --accent-soft:#3a1d1b;
+    --good:#3ccf91; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1114; --surface:#181b20; --surface-2:#21252c; --text:#eef0f3; --muted:#9aa1ad;
+  --line:#2b3038; --accent:#ff4d42; --accent-ink:#fff; --accent-soft:#3a1d1b;
+  --good:#3ccf91; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px;line-height:1.5}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1280px;margin:0 auto;padding:0 16px}
+
+header{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top{display:flex;align-items:center;gap:12px;height:60px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:18px;letter-spacing:-.02em;margin-right:auto}
+.logo i{width:28px;height:20px;border-radius:6px;background:var(--accent);position:relative;display:inline-block}
+.logo i:after{content:"";position:absolute;left:11px;top:5px;border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;text-decoration:none;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.sm{height:30px;padding:0 10px;font-size:13px}
+.btn[disabled]{opacity:.5;cursor:default}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500}
+.tab.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 14px}
+.toolbar h1{font-size:22px;margin:0 auto 0 0;letter-spacing:-.02em}
+.toolbar h1 small{font-size:13px;color:var(--muted);font-weight:400;margin-left:8px}
+.field{height:36px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 10px;min-width:0}
+#q{width:200px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px;padding-bottom:120px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.sel{outline:2px solid var(--accent);outline-offset:-1px}
+.ch-head{display:flex;gap:12px;align-items:center}
+.rank{flex:none;width:30px;font-weight:900;font-size:18px;color:var(--muted);text-align:center;font-variant-numeric:tabular-nums}
+.rank.top{color:var(--accent)}
+.avatar{flex:none;width:52px;height:52px;border-radius:50%;background:var(--surface-2);object-fit:cover}
+.ch-name{font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-name a{text-decoration:none}.ch-name a:hover{text-decoration:underline}
+.stats{display:flex;flex-wrap:wrap;gap:4px 12px;color:var(--muted);font-size:13px}
+.stats b{color:var(--text);font-weight:700}
+.desc{color:var(--muted);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:39px;margin:0}
+.vids-title{font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px}
+.vids{display:flex;flex-direction:column;gap:6px;min-height:250px}
+.vid{display:flex;gap:10px;align-items:center;text-decoration:none;border-radius:8px;padding:3px}
+.vid:hover{background:var(--surface-2)}
+.vid img{flex:none;width:80px;height:45px;border-radius:6px;object-fit:cover;background:var(--surface-2)}
+.vid .t{font-size:13px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.vid .v{font-size:12px;color:var(--muted)}
+.vid .n{flex:none;width:14px;font-size:12px;font-weight:700;color:var(--muted)}
+.skel{height:45px;border-radius:8px;background:linear-gradient(90deg,var(--surface-2),var(--line),var(--surface-2));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.card-foot{display:flex;gap:8px;margin-top:auto}
+.card-foot .btn{flex:1}
+.chk{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--muted);flex:none;padding:0 6px}
+.chk input{accent-color:var(--accent);width:16px;height:16px}
+
+.empty{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:40px 24px;text-align:center;max-width:640px;margin:40px auto}
+.empty h2{margin:0 0 8px}
+.empty ol{text-align:left;display:inline-block;color:var(--muted);margin:12px 0 20px}
+.err{color:var(--accent);white-space:pre-line;word-break:break-all}
+.loading{text-align:center;color:var(--muted);padding:60px 0}
+.spinner{width:28px;height:28px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.tray{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -4px 16px rgba(0,0,0,.08);transform:translateY(110%);transition:transform .2s}
+.tray.show{transform:none}
+.tray .wrap{display:flex;align-items:center;gap:10px;min-height:64px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-right:auto}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface-2);border-radius:999px;padding:4px 6px 4px 4px;font-size:13px;max-width:200px}
+.chip img{width:22px;height:22px;border-radius:50%}
+.chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1}
+
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--surface);color:var(--text);padding:0;width:min(760px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+.dlg-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dlg-head h3{margin:0;font-size:17px}
+.dlg-body{padding:20px;overflow:auto}
+.x{border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted)}
+.help{color:var(--muted);font-size:13px}
+.help ol{padding-left:18px}
+.row{display:flex;gap:8px}
+.row .field{flex:1}
+
+table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp th,.cmp td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:right;vertical-align:middle}
+.cmp th:first-child,.cmp td:first-child{text-align:left;color:var(--muted);font-weight:500;white-space:nowrap}
+.cmp thead th{text-align:center;font-weight:700}
+.cmp thead img{width:40px;height:40px;border-radius:50%;display:block;margin:0 auto 4px}
+.cmp td.best{color:var(--good);font-weight:700}
+.cmp td{font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--surface-2);margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+
+@media (max-width:520px){
+  .grid{grid-template-columns:1fr}
+  #q{width:100%;flex:1 1 100%}
+  .top .btn .lbl{display:none}
+  .toolbar h1{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap top">
+    <div class="logo"><i></i>유튜버 비교 분석</div>
+    <button class="btn" id="btnSettings" hidden>⚙</button>
+    <a class="btn primary" id="btnContactTop" href="#">✉ <span class="lbl">광고 문의</span></a>
+  </div>
+  <div class="wrap"><nav class="tabs" id="tabs"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="toolbar">
+    <h1 id="catTitle">카테고리</h1>
+    <input class="field" id="q" placeholder="채널명 검색">
+    <select class="field" id="sort">
+      <option value="subs">구독자 순</option>
+      <option value="views">총 조회수 순</option>
+      <option value="avg">영상당 평균 조회수 순</option>
+    </select>
+    <button class="btn" id="btnCsv">CSV 내보내기</button>
+    <button class="btn" id="btnRefresh" hidden>↻</button>
+  </div>
+  <div id="view"></div>
+</main>
+
+<div class="tray" id="tray">
+  <div class="wrap">
+    <div class="chips" id="chips"></div>
+    <button class="btn" id="btnClear">비우기</button>
+    <button class="btn primary" id="btnCompare">비교하기</button>
+  </div>
+</div>
+
+<dialog id="dlgSettings">
+  <div class="dlg-head"><h3>YouTube API 설정</h3><button class="x" data-close>×</button></div>
+  <div class="dlg-body">
+    <div class="row">
+      <input class="field" id="apiKey" placeholder="YouTube Data API v3 키 입력" autocomplete="off">
+      <button class="btn primary" id="btnSaveKey">저장</button>
+    </div>
+    <div class="help">
+      <p>키는 이 브라우저에만 저장되며 YouTube(Google) 서버 요청에만 사용됩니다.</p>
+      <ol>
+        <li><a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a>에서 프로젝트 생성</li>
+        <li>‘API 및 서비스 → 라이브러리’에서 <b>YouTube Data API v3</b> 사용 설정</li>
+        <li>‘사용자 인증 정보 → API 키 만들기’로 키 발급 후 위에 붙여넣기</li>
+      </ol>
+      <p>무료 할당량은 하루 10,000 단위입니다. 카테고리 1개 최초 로딩에 최대 약 800 단위(채널 100개의 인기 영상 포함)가 들고, 결과는 24시간 동안 저장되어 재사용됩니다.</p>
+    </div>
+    <button class="btn" id="btnClearCache">저장된 데이터 전체 삭제</button>
+  </div>
+</dialog>
+
+<dialog id="dlgCompare">
+  <div class="dlg-head"><h3>채널 비교</h3><button class="x" data-close>×</button></div>
+  <div class="dlg-body" id="cmpBody"></div>
+</dialog>
+
+<script>
+/* ===== 설정: 카테고리와 검색 키워드는 여기서 자유롭게 수정 ===== */
+const CONTACT_EMAIL = 'leehwasup@naver.com';
+const MAX_CHANNELS = 100;
+const CACHE_HOURS = 24;
+const CATEGORIES = [
+  {id:'food',    name:'먹방·요리',     q:['먹방','요리 레시피','맛집']},
+  {id:'beauty',  name:'뷰티·패션',     q:['뷰티 메이크업','패션 코디','스킨케어']},
+  {id:'game',    name:'게임',          q:['게임 방송','게임 유튜버','롤 리그오브레전드']},
+  {id:'music',   name:'음악·댄스',     q:['노래 커버','댄스','음악']},
+  {id:'ent',     name:'예능·코미디',   q:['예능','코미디','웃긴 영상']},
+  {id:'edu',     name:'교육·지식',     q:['지식','교육','공부']},
+  {id:'tech',    name:'IT·테크',       q:['IT 리뷰','테크 리뷰','스마트폰 리뷰']},
+  {id:'finance', name:'경제·재테크',   q:['재테크','주식','부동산']},
+  {id:'travel',  name:'여행·브이로그', q:['여행','브이로그','일상 브이로그']},
+  {id:'sports',  name:'스포츠·운동',   q:['운동 헬스','홈트레이닝','축구']},
+  {id:'kids',    name:'키즈',          q:['키즈','장난감','동요']},
+  {id:'pet',     name:'반려동물',      q:['강아지','고양이','반려동물']},
+  {id:'car',     name:'자동차',        q:['자동차 리뷰','신차','자동차']},
+];
+
+/* ===== 저장소 ===== */
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} },
+  keys(){ try{ return Object.keys(localStorage); }catch(e){ return []; } }
+};
+const fresh = c => c && Date.now() - c.t < CACHE_HOURS*3600e3;
+
+/* ===== 유틸 ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function ko(n){
+  n = Number(n)||0;
+  if(n >= 1e8) return (n/1e8).toFixed(n>=1e9?0:1).replace(/\.0$/,'')+'억';
+  if(n >= 1e4) return (n/1e4).toFixed(n>=1e5?0:1).replace(/\.0$/,'')+'만';
+  return n.toLocaleString('ko-KR');
+}
+function ago(d){
+  const days = Math.floor((Date.now()-new Date(d))/864e5);
+  if(days < 1) return '오늘';
+  if(days < 30) return days+'일 전';
+  if(days < 365) return Math.floor(days/30)+'개월 전';
+  return Math.floor(days/365)+'년 전';
+}
+function mailto(ch){
+  const subject = ch ? `[협찬/광고 문의] ${ch.title}` : '[광고 문의]';
+  const body = ch
+    ? `안녕하세요. 아래 유튜버 협찬/광고를 문의드립니다.\n\n■ 채널명: ${ch.title}\n■ 채널 링크: https://www.youtube.com/channel/${ch.id}\n■ 구독자 수: ${ko(ch.subs)}명\n\n■ 회사명/브랜드:\n■ 담당자 성함:\n■ 연락처:\n■ 희망 광고 형태(PPL, 브랜디드, 단독 리뷰 등):\n■ 희망 일정:\n■ 예산 범위:\n■ 기타 요청사항:\n`
+    : `안녕하세요. 유튜버 광고/협찬을 문의드립니다.\n\n■ 회사명/브랜드:\n■ 담당자 성함:\n■ 연락처:\n■ 관심 분야/채널:\n■ 희망 일정:\n■ 예산 범위:\n■ 기타 요청사항:\n`;
+  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/* ===== YouTube API ===== */
+const apiKey = 'server';   // 키는 Vercel 서버(api/yt.js)에 보관
+async function yt(path, params){
+  const u = new URL('/api/yt', location.origin);
+  u.searchParams.set('path', path);
+  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k,v));
+  let r;
+  try{ r = await fetch(u); }
+  catch(e){ throw new Error('YouTube 서버에 연결하지 못했습니다. 인터넷 연결이나 광고 차단 프로그램을 확인해 주세요.'); }
+  const j = await r.json();
+  if(j.error){
+    const msg = j.error.message || '';
+    const reasons = [...(j.error.errors||[]).map(e => e.reason), ...(j.error.details||[]).map(d => d.reason)].join(' ');
+    const has = re => re.test(reasons + ' ' + msg);
+    let hint;
+    if(has(/quotaExceeded|dailyLimit/i)) hint = '오늘 API 할당량을 모두 사용했습니다. 한국 시간 오후 4~5시(태평양 자정)에 초기화됩니다.';
+    else if(has(/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/i)) hint = '이 키의 프로젝트에서 "YouTube Data API v3"가 사용 설정되지 않았습니다. Google Cloud Console → API 및 서비스 → 라이브러리에서 사용 설정 후 몇 분 뒤 다시 시도해 주세요.';
+    else if(has(/referer|referrer|ipRefererBlocked|API_KEY_HTTP_REFERRER_BLOCKED/i)) hint = 'API 키에 "웹사이트 제한"이 걸려 있어 차단되었습니다. 사용자 인증 정보 → 키 편집 → 애플리케이션 제한사항을 "없음"으로 바꿔 주세요.';
+    else if(has(/API_KEY_SERVICE_BLOCKED|blocked/i)) hint = 'API 키의 "API 제한사항"에 YouTube Data API v3가 빠져 있습니다. 키 편집에서 YouTube Data API v3를 허용해 주세요.';
+    else if(has(/keyInvalid|API_KEY_INVALID|API key not valid/i)) hint = 'API 키가 올바르지 않습니다. 앞뒤 공백 없이 키 전체를 다시 붙여넣어 주세요.';
+    else hint = '알 수 없는 오류입니다.';
+    throw new Error(`${hint}\n(Google 원문: ${msg})`);
+  }
+  return j;
+}
+
+async function loadCategory(cat, force){
+  const ck = 'cat:'+cat.id+':'+cat.q.join('|');
+  const c = store.get(ck);
+  if(!force && fresh(c)) return c.items;
+
+  const ids = new Set();
+  for(const q of cat.q){
+    let pageToken = '';
+    for(let p=0; p<2; p++){                     // 키워드당 최대 100개 후보
+      const params = {part:'snippet',type:'channel',q,regionCode:'KR',relevanceLanguage:'ko',maxResults:50};
+      if(pageToken) params.pageToken = pageToken;
+      const res = await yt('search', params);
+      res.items.forEach(it => ids.add(it.snippet.channelId || it.id.channelId));
+      pageToken = res.nextPageToken;
+      if(!pageToken || ids.size >= 250) break;
+    }
+  }
+
+  const list = [...ids];
+  const out = [];
+  for(let i=0; i<list.length; i+=50){
+    const res = await yt('channels', {part:'snippet,statistics,contentDetails', id:list.slice(i,i+50).join(','), maxResults:50});
+    for(const ch of res.items){
+      if(ch.statistics.hiddenSubscriberCount) continue;
+      const s = ch.snippet, st = ch.statistics;
+      out.push({
+        id: ch.id, title: s.title, desc: s.description || '', handle: s.customUrl || '',
+        thumb: s.thumbnails?.medium?.url || s.thumbnails?.default?.url || '',
+        subs: +st.subscriberCount || 0, views: +st.viewCount || 0, videos: +st.videoCount || 0,
+        uploads: ch.contentDetails?.relatedPlaylists?.uploads || ''
+      });
+    }
+  }
+  out.sort((a,b) => b.subs - a.subs);
+  const items = out.slice(0, MAX_CHANNELS);
+  store.set(ck, {t:Date.now(), items});
+  return items;
+}
+
+const topCache = {};
+async function loadTop5(ch){
+  if(topCache[ch.id]) return topCache[ch.id];
+  const c = store.get('top:'+ch.id);
+  if(fresh(c)) return topCache[ch.id] = c.items;
+  if(!ch.uploads) return [];
+  const pl = await yt('playlistItems', {part:'contentDetails', playlistId:ch.uploads, maxResults:50});
+  const vids = pl.items.map(i => i.contentDetails.videoId);
+  if(!vids.length) return topCache[ch.id] = [];
+  const vr = await yt('videos', {part:'snippet,statistics', id:vids.join(',')});
+  const items = vr.items.map(v => ({
+    id: v.id, title: v.snippet.title, date: v.snippet.publishedAt,
+    thumb: v.snippet.thumbnails?.medium?.url || v.snippet.thumbnails?.default?.url || '',
+    views: +v.statistics.viewCount || 0
+  })).sort((a,b) => b.views - a.views).slice(0,5);
+  store.set('top:'+ch.id, {t:Date.now(), items});
+  return topCache[ch.id] = items;
+}
+
+/* ===== 상태 ===== */
+let curCat = CATEGORIES.find(c => c.id === store.get('lastCat')) || CATEGORIES[0];
+let channels = [];
+const selected = new Map();           // id -> channel (비교 대상, 최대 4)
+const byId = new Map();
+
+/* ===== 렌더링 ===== */
+function renderTabs(){
+  $('#tabs').innerHTML = CATEGORIES.map(c =>
+    `<button class="tab ${c.id===curCat.id?'on':''}" data-cat="${c.id}">${esc(c.name)}</button>`).join('');
+}
+
+function sorted(){
+  const q = $('#q').value.trim().toLowerCase();
+  const s = $('#sort').value;
+  let arr = channels.map((c,i) => ({...c, rank:i+1}));
+  if(q) arr = arr.filter(c => c.title.toLowerCase().includes(q) || c.handle.toLowerCase().includes(q));
+  const key = {subs:c=>c.subs, views:c=>c.views, avg:c=>c.videos?c.views/c.videos:0}[s];
+  return arr.sort((a,b) => key(b)-key(a));
+}
+
+function cardHTML(c){
+  const avg = c.videos ? c.views/c.videos : 0;
+  return `<article class="card ${selected.has(c.id)?'sel':''}" data-id="${c.id}">
+    <div class="ch-head">
+      <div class="rank ${c.rank<=3?'top':''}">${c.rank}</div>
+      <img class="avatar" src="${esc(c.thumb)}" alt="" loading="lazy">
+      <div style="min-width:0;flex:1">
+        <div class="ch-name"><a href="https://www.youtube.com/channel/${c.id}" target="_blank" rel="noopener">${esc(c.title)}</a></div>
+        <div class="stats"><span>구독자 <b>${ko(c.subs)}</b></span><span>영상 ${ko(c.videos)}개</span><span>평균 ${ko(avg)}회</span></div>
+      </div>
+    </div>
+    <p class="desc">${esc(c.desc.replace(/\s+/g,' ').trim()) || '채널 소개가 없습니다.'}</p>
+    <div>
+      <p class="vids-title">최근 영상 50개 중 조회수 TOP 5</p>
+      <div class="vids" data-vids="${c.id}">${'<div class="skel"></div>'.repeat(5)}</div>
+    </div>
+    <div class="card-foot">
+      <label class="chk"><input type="checkbox" data-cmp="${c.id}" ${selected.has(c.id)?'checked':''}>비교</label>
+      <a class="btn primary sm" href="${mailto(c)}">✉ 협찬·광고 문의</a>
+    </div>
+  </article>`;
+}
+
+function vidsHTML(list){
+  if(!list.length) return '<p class="help">공개된 영상이 없습니다.</p>';
+  return list.map((v,i) => `<a class="vid" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">
+      <span class="n">${i+1}</span>
+      <img src="${esc(v.thumb)}" alt="" loading="lazy">
+      <span style="min-width:0"><span class="t">${esc(v.title)}</span><span class="v">조회수 ${ko(v.views)}회 · ${ago(v.date)}</span></span>
+    </a>`).join('');
+}
+
+let io;
+function renderList(){
+  const arr = sorted();
+  if(!arr.length){ $('#view').innerHTML = '<div class="loading">검색 결과가 없습니다.</div>'; return; }
+  $('#view').innerHTML = `<div class="grid">${arr.map(cardHTML).join('')}</div>`;
+  arr.forEach(c => byId.set(c.id, c));
+  io?.disconnect();
+  io = new IntersectionObserver(ents => ents.forEach(e => {
+    if(!e.isIntersecting) return;
+    io.unobserve(e.target);
+    queueTop5(e.target.dataset.vids, e.target);
+  }), {rootMargin:'400px'});
+  document.querySelectorAll('[data-vids]').forEach(el => io.observe(el));
+}
+
+/* 동시 요청 4개로 제한 */
+const queue = []; let running = 0;
+function queueTop5(id, el){ queue.push([id,el]); pump(); }
+function pump(){
+  while(running < 4 && queue.length){
+    const [id, el] = queue.shift(); running++;
+    loadTop5(byId.get(id))
+      .then(list => { el.innerHTML = vidsHTML(list); })
+      .catch(err => { el.innerHTML = `<p class="help err">${esc(err.message)}</p>`; })
+      .finally(() => { running--; pump(); });
+  }
+}
+
+function renderNoKey(){
+  $('#view').innerHTML = `<div class="empty">
+    <h2>YouTube API 키를 등록해 주세요</h2>
+    <p class="help">실시간 구독자 수와 인기 영상을 불러오려면 무료 YouTube Data API 키가 필요합니다.</p>
+    <ol><li>Google Cloud Console에서 프로젝트 생성</li><li>YouTube Data API v3 사용 설정</li><li>API 키 발급 후 아래 버튼으로 등록</li></ol><br>
+    <button class="btn primary" onclick="openSettings()">API 키 등록하기</button>
+  </div>`;
+}
+
+async function showCategory(force){
+  $('#catTitle').innerHTML = `${esc(curCat.name)} <small id="count"></small>`;
+  renderTabs();
+  if(!apiKey){ renderNoKey(); return; }
+  $('#view').innerHTML = '<div class="loading"><div class="spinner"></div>채널 정보를 불러오는 중입니다…</div>';
+  const cat = curCat;
+  try{
+    const items = await loadCategory(cat, force);
+    if(cat !== curCat) return;
+    channels = items;
+    $('#count').textContent = `구독자 상위 ${items.length}개 채널`;
+    renderList();
+  }catch(err){
+    if(cat !== curCat) return;
+    $('#view').innerHTML = `<div class="empty"><h2>불러오지 못했습니다</h2><p class="err">${esc(err.message)}</p></div>`;
+  }
+}
+
+/* ===== 비교 ===== */
+function renderTray(){
+  $('#tray').classList.toggle('show', selected.size > 0);
+  $('#chips').innerHTML = [...selected.values()].map(c =>
+    `<span class="chip"><img src="${esc(c.thumb)}" alt=""><span>${esc(c.title)}</span><button data-rm="${c.id}" title="빼기">×</button></span>`).join('')
+    + `<span class="help" style="align-self:center">${selected.size}/4 선택</span>`;
+  $('#btnCompare').disabled = selected.size < 2;
+}
+function toggleSel(id, on){
+  if(on && selected.size >= 4){ alert('최대 4개 채널까지 비교할 수 있습니다.'); return false; }
+  on ? selected.set(id, byId.get(id)) : selected.delete(id);
+  document.querySelector(`.card[data-id="${id}"]`)?.classList.toggle('sel', on);
+  const cb = document.querySelector(`[data-cmp="${id}"]`); if(cb) cb.checked = on;
+  renderTray();
+  return true;
+}
+
+async function openCompare(){
+  const list = [...selected.values()];
+  $('#cmpBody').innerHTML = '<div class="loading"><div class="spinner"></div>분석 중…</div>';
+  $('#dlgCompare').showModal();
+  const tops = await Promise.all(list.map(c => loadTop5(c).catch(() => [])));
+  const rows = [
+    ['구독자 수', c => c.subs, v => ko(v)+'명'],
+    ['총 조회수', c => c.views, v => ko(v)+'회'],
+    ['업로드 영상 수', c => c.videos, v => ko(v)+'개'],
+    ['영상당 평균 조회수', c => c.videos ? c.views/c.videos : 0, v => ko(v)+'회'],
+    ['최근 TOP5 평균 조회수', (c,i) => tops[i].length ? tops[i].reduce((s,v)=>s+v.views,0)/tops[i].length : 0, v => ko(v)+'회'],
+    ['최근 TOP1 조회수', (c,i) => tops[i][0]?.views || 0, v => ko(v)+'회'],
+    ['구독자 대비 반응률 (TOP5 평균 ÷ 구독자)', (c,i) => { const t=tops[i]; return t.length&&c.subs ? t.reduce((s,v)=>s+v.views,0)/t.length/c.subs*100 : 0; }, v => v.toFixed(1)+'%'],
+  ];
+  const head = `<tr><th></th>${list.map(c => `<th><img src="${esc(c.thumb)}" alt="">${esc(c.title)}</th>`).join('')}</tr>`;
+  const body = rows.map(([label, fn, fmt]) => {
+    const vals = list.map((c,i) => fn(c,i));
+    const max = Math.max(...vals);
+    return `<tr><td>${label}</td>${vals.map(v =>
+      `<td class="${v===max&&max>0?'best':''}">${fmt(v)}<div class="bar"><i style="width:${max?v/max*100:0}%"></i></div></td>`).join('')}</tr>`;
+  }).join('');
+  const contact = `<tr><td>문의</td>${list.map(c => `<td style="text-align:center"><a class="btn primary sm" href="${mailto(c)}">✉ 문의</a></td>`).join('')}</tr>`;
+  $('#cmpBody').innerHTML = `<div style="overflow-x:auto"><table class="cmp"><thead>${head}</thead><tbody>${body}${contact}</tbody></table></div>
+    <p class="help">초록색은 항목별 최고값입니다. 반응률이 높을수록 구독자 규모 대비 최근 영상 반응이 좋은 채널입니다.</p>`;
+}
+
+/* ===== CSV ===== */
+function exportCsv(){
+  if(!channels.length) return;
+  const rows = [['순위','채널명','채널 링크','구독자 수','총 조회수','영상 수','영상당 평균 조회수','소개']];
+  channels.forEach((c,i) => rows.push([i+1, c.title, 'https://www.youtube.com/channel/'+c.id, c.subs, c.views, c.videos,
+    Math.round(c.videos?c.views/c.videos:0), c.desc.replace(/\s+/g,' ').slice(0,200)]));
+  const csv = '﻿' + rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+  a.download = `유튜버_${curCat.name}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+/* ===== 이벤트 ===== */
+function openSettings(){ $('#apiKey').value = apiKey; $('#dlgSettings').showModal(); }
+$('#btnSettings').onclick = openSettings;
+$('#btnContactTop').href = mailto(null);
+$('#btnClearCache').onclick = () => {
+  if(!confirm('저장된 채널·영상 데이터를 모두 삭제할까요? (API 키는 유지됩니다)')) return;
+  store.keys().filter(k => k.startsWith('cat:') || k.startsWith('top:')).forEach(store.del);
+  Object.keys(topCache).forEach(k => delete topCache[k]);
+  $('#dlgSettings').close(); showCategory();
+};
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => b.closest('dialog').close());
+document.querySelectorAll('dialog').forEach(d => d.addEventListener('click', e => { if(e.target === d) d.close(); }));
+
+$('#tabs').onclick = e => {
+  const id = e.target.closest('[data-cat]')?.dataset.cat; if(!id) return;
+  curCat = CATEGORIES.find(c => c.id === id); store.set('lastCat', id);
+  $('#q').value = ''; queue.length = 0;
+  showCategory();
+};
+$('#q').oninput = () => channels.length && renderList();
+$('#sort').onchange = () => channels.length && renderList();
+$('#btnRefresh').onclick = () => showCategory(true);
+$('#btnCsv').onclick = exportCsv;
+$('#view').addEventListener('change', e => {
+  const id = e.target.dataset.cmp; if(!id) return;
+  if(!toggleSel(id, e.target.checked)) e.target.checked = false;
+});
+$('#chips').onclick = e => { const id = e.target.dataset.rm; if(id) toggleSel(id, false); };
+$('#btnClear').onclick = () => [...selected.keys()].forEach(id => toggleSel(id, false));
+$('#btnCompare').onclick = openCompare;
+
+showCategory();
+</script>
+</body>
+</html>
